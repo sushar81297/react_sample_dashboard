@@ -68,7 +68,7 @@ export default function HeaderMenu({
             }}
           />
         </Col>
-        <Col span={10} style={{ direction: "rtl" }}>
+        <Col span={10} style={{ textAlign: "right" }}>
           <Dropdown menu={{ items }} placement="bottomRight" arrow>
             <Avatar icon={<UserOutlined />} style={{ cursor: "pointer" }} />
           </Dropdown>

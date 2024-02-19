@@ -58,7 +58,7 @@ interface ReportData {
 
 interface SearchParam {
   key: string;
-  value: string | number | undefined;
+  value: string;
 }
 interface FilterReportData {
   filter?: searchParam[];
