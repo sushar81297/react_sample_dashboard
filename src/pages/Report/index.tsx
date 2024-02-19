@@ -17,6 +17,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import type { TableProps } from "antd";
 import { dateFormat } from "@utils/constant.ts";
 import dayjs from "dayjs";
+import { useGetOrderData } from "@api/features/order";
 
 export default function App() {
   const [visible, setVisible] = useState(false);
@@ -26,6 +27,14 @@ export default function App() {
   const [totalAmt, setTotalAmt] = useState(0);
   const [filterReport, setFilterReport] = useState({} as FilterReportData);
   const [showForm, setShowForm] = useState(true);
+
+  const queryResponse = useGetOrderData(filterReport);
+
+  useEffect(() => {
+    if (queryResponse) {
+      console.log(queryResponse.data, "ddd");
+    }
+  }, [queryResponse]);
 
   const columns: TableProps<OrderData>["columns"] = [
     {
@@ -140,7 +149,7 @@ export default function App() {
   };
 
   const onFinish = (value: ReportData) => {
-    const params: SearchParam[] = [
+    const params = [
       { key: "buyer.merchantCode", value: value.buyerCode },
       { key: "buyer.name", value: value.buyerName },
       { key: "buyer.phoneNumber", value: value.buyerPhone },
@@ -245,7 +254,7 @@ export default function App() {
         dataSource={data?.data ? data?.data : []}
         loading={loading}
         pagination={false}
-        // scroll={{ y: 300 }}
+        scroll={{ y: 300 }}
       />
       <Pagination
         className="pagination"
