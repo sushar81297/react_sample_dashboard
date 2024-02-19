@@ -1,0 +1,190 @@
+@import "./_variable.scss";
+
+.header-menu {
+  background-color: $secondary-color;
+}
+
+// logo css
+.logo {
+  text-align: center;
+}
+.content-container {
+  background: $white-color;
+  color: $primary-color;
+  padding: 24px;
+  min-height: 360px;
+  h2.title {
+    margin-bottom: 2vw;
+  }
+}
+// login form
+.login-container {
+  width: 30vw;
+  margin: 0 auto;
+  margin-top: 5%;
+  padding: 2vw;
+  text-align: center;
+  color: $primary-color;
+  border: 1px solid transparent;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  img {
+    width: 12vw;
+    margin: 0 auto;
+  }
+  h2 {
+    margin: 0;
+    color: $primary-color;
+  }
+  p {
+    color: $primary-color;
+  }
+  .ant-form-item-explain-error {
+    text-align: left;
+  }
+  .ant-form-item-control-input-content {
+    // text-align: left;
+
+    display: flex;
+    justify-content: center;
+  }
+
+  :where(.css-dev-only-do-not-override-zl9ks2).ant-checkbox-checked
+    .ant-checkbox-inner {
+    background: $primary-color;
+    border-color: $primary-color;
+  }
+  :where(.css-dev-only-do-not-override-zl9ks2).ant-checkbox-wrapper {
+    justify-content: start;
+    display: flex;
+  }
+}
+//end login form
+
+// button
+.button-container {
+  display: flex;
+  justify-content: center;
+}
+.btn-green {
+  background: $primary-color;
+  color: $white-color;
+}
+.btn-green:hover {
+  color: $white-color;
+  background-color: $secondary-color;
+}
+.btn-green-outline {
+  border-color: $primary-color;
+  color: $primary-color;
+}
+.btn-green-outline:hover {
+  color: $white-color;
+  background-color: $secondary-color;
+}
+.signup {
+  text-decoration: underline;
+  color: #1677ff;
+}
+// end button
+
+// side bar icon design
+:where(.css-dev-only-do-not-override-zl9ks2).ant-layout
+  .ant-layout-sider-zero-width-trigger {
+  top: 8px;
+  background: transparent;
+  color: $primary-color;
+  font-size: 3vw;
+}
+
+// sidebar item color
+:where(.css-dev-only-do-not-override-zl9ks2) a {
+  color: inherit;
+}
+:where(.css-dev-only-do-not-override-zl9ks2).ant-menu-light
+  .ant-menu-submenu-selected
+  > .ant-menu-submenu-title,
+:where(.css-dev-only-do-not-override-zl9ks2).ant-menu-light
+  > .ant-menu
+  .ant-menu-submenu-selected
+  > .ant-menu-submenu-title {
+  color: $primary-color;
+  transition: 0.15s padding ease-out, 0.15s margin ease-out,
+    0.15s border ease-out;
+}
+:where(.css-dev-only-do-not-override-zl9ks2).ant-menu-light
+  .ant-menu-item-selected {
+  background-color: $secondary-color;
+  color: $primary-color;
+  transition: 0.15s padding ease-out, 0.15s margin ease-out,
+    0.15s border ease-out;
+}
+:where(.css-dev-only-do-not-override-zl9ks2).ant-layout
+  .ant-layout-sider-trigger {
+  background-color: $secondary-color;
+}
+.ant-menu-submenu-title {
+  color: $white-color !important;
+}
+.ant-layout-sider-trigger {
+  background-color: $primary-color !important;
+  span {
+    display: none;
+  }
+}
+
+// header css
+.ant-layout-header {
+  padding: 0 20px;
+}
+
+// menu bar icon size
+:where(.css-dev-only-do-not-override-zl9ks2).ant-btn.ant-btn-icon-only
+  .anticon {
+  font-size: 25px;
+}
+
+// order detail list
+div.order-btn-container {
+  display: flex;
+  justify-content: center;
+  .order-btn {
+    padding: 0 30px;
+    margin-top: 10px;
+  }
+}
+.order-price {
+  float: right;
+}
+div.order-list {
+  padding: 20px;
+  max-height: 50vh;
+  overflow: auto;
+  box-shadow: rgba(0, 0, 0, 0.09) 0px 3px 12px;
+}
+h3.total-amt {
+  border: 1px solid $primary-color;
+  margin-top: 10px;
+  padding: 5px 10px;
+}
+
+// pagination
+
+.pagination {
+  display: flex;
+  justify-content: end;
+  margin-top: 30px;
+}
+
+// report
+.report-form {
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.show {
+  display: block;
+}
+
+.hide {
+  display: none;
+}

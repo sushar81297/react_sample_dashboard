@@ -1,0 +1,304 @@
+import {
+  Button,
+  DatePicker,
+  Flex,
+  Form,
+  Input,
+  Modal,
+  Pagination,
+  Space,
+  Table,
+} from "antd";
+import { getOrderById, getOrderData } from "@api/report";
+import { useEffect, useState } from "react";
+
+import type { PaginationProps } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
+import type { TableProps } from "antd";
+import { dateFormat } from "@utils/constant.ts";
+import dayjs from "dayjs";
+
+export default function App() {
+  const [visible, setVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState({} as OrderResponse);
+  const [order, setOrder] = useState([] as OrderDetail[]);
+  const [totalAmt, setTotalAmt] = useState(0);
+  const [filterReport, setFilterReport] = useState({} as FilterReportData);
+  const [showForm, setShowForm] = useState(true);
+
+  const columns: TableProps<OrderData>["columns"] = [
+    {
+      title: "No.",
+      dataIndex: "key",
+      key: "key",
+      align: "center",
+    },
+    {
+      title: "Seller Merchant",
+      dataIndex: "seller_merchant",
+      key: "seller_merchant",
+    },
+    {
+      title: "Buyer Merchant",
+      dataIndex: "buyer_merchant",
+      key: "buyer_merchant",
+    },
+    {
+      title: "Buyer Phone Number",
+      dataIndex: "buyer_phone",
+      key: "buyer_phone",
+    },
+
+    {
+      title: "Net Amount",
+      dataIndex: "net_amount",
+      key: "net_amount",
+    },
+
+    {
+      title: "Order Date",
+      dataIndex: "order_date",
+      key: "order_date",
+      render: (order_date) => (
+        <span>{dayjs(order_date).format(dateFormat)}</span>
+      ),
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (record: OrderData) => (
+        <Space size="middle">
+          <Button onClick={() => detailFunc(record.id)} className="btn-green">
+            Order Detail
+          </Button>
+        </Space>
+      ),
+    },
+  ];
+
+  const detailFunc = async (id: string) => {
+    setLoading(true);
+    const detailData = await getOrderById(id);
+    let total = 0;
+    detailData?.order_details.map((order: OrderDetail) => {
+      total += order.total_amount;
+    });
+    setOrder(detailData.order_details);
+    setTotalAmt(total);
+    setLoading(false);
+    setVisible(true);
+  };
+
+  const fetchData = async (searchParam: FilterReportData) => {
+    const updatedData = await getOrderData(searchParam);
+    if (
+      updatedData &&
+      updatedData?.orders?.data &&
+      updatedData?.orders?.data.length > 0
+    ) {
+      const data = updatedData.orders.data.map(
+        (item: OrderData, index: number) => ({
+          ...item,
+          key:
+            updatedData.orders.currentPage * updatedData.orders.pageSize +
+            (index + 1),
+        })
+      );
+      setLoading(false);
+      updatedData.orders.data = data;
+      setData(updatedData.orders);
+    } else {
+      setData({} as OrderResponse);
+    }
+  };
+
+  useEffect(() => {
+    setLoading(true);
+    fetchData({ pageNumber: 0, pageSize: 10 });
+  }, []);
+
+  const onCloseFunc = () => {
+    setVisible(false);
+  };
+
+  const onChange = async (pageNumber: number, pageSize: number) => {
+    const filter = filterReport;
+    filter.pageNumber = pageNumber - 1;
+    filter.pageSize = pageSize;
+    filterReportFunc(filter);
+  };
+
+  const onShowSizeChange: PaginationProps["onShowSizeChange"] = (
+    current,
+    pageSize
+  ) => {
+    const filter = filterReport;
+    filter.pageNumber = current;
+    filter.pageSize = pageSize;
+    filterReportFunc(filter);
+  };
+
+  const onFinish = (value: ReportData) => {
+    const params: SearchParam[] = [
+      { key: "buyer.merchantCode", value: value.buyerCode },
+      { key: "buyer.name", value: value.buyerName },
+      { key: "buyer.phoneNumber", value: value.buyerPhone },
+      { key: "seller.merchantCode", value: value.sellerCode },
+      { key: "seller.name", value: value.sellerName },
+      { key: "seller.phoneNumber", value: value.sellerPhone },
+      { key: "minAmount", value: value.minAmount },
+      { key: "maxAmount", value: value.maxAmount },
+      {
+        key: "fromDate",
+        value: value.fromDate ? dayjs(value.fromDate).format(dateFormat) : "",
+      },
+      {
+        key: "toDate",
+        value: value.toDate
+          ? dayjs(value.toDate)
+              .hour(23)
+              .minute(59)
+              .second(59)
+              .format(dateFormat)
+          : "",
+      },
+    ].filter((param) => param.value !== "" && param.value !== undefined);
+    filterReportFunc({ filter: params, pageNumber: 0, pageSize: 10 });
+  };
+
+  const filterReportFunc = (filter: FilterReportData) => {
+    setFilterReport(filter);
+    setLoading(true);
+    fetchData(filter);
+  };
+
+  const toggleSearch = () => {
+    setShowForm(!showForm);
+  };
+
+  return (
+    <>
+      <div className="report-form">
+        <Form
+          className={`form report ${showForm ? "show" : "hide"}`}
+          onFinish={onFinish}
+          autoComplete="off"
+        >
+          <Flex align="center" justify="center" gap={15}>
+            {/* <Form.Item name="buyerCode" label="Buyer Code">
+            <Input placeholder="Buyer Code" />
+          </Form.Item> */}
+            <Form.Item name="buyerName" label="Buyer Name">
+              <Input placeholder="Buyer Name" />
+            </Form.Item>
+            <Form.Item name="buyerPhone" label="Buyer Phone">
+              <Input placeholder="Buyer Phone Number" />
+            </Form.Item>
+            {/* </Flex>
+        <Flex align="center" justify="center" gap={15}> */}
+            {/* <Form.Item name="sellerCode" label="Seller Code">
+            <Input placeholder="Seller Code" />
+          </Form.Item> */}
+            <Form.Item name="sellerName" label="Seller Name">
+              <Input placeholder="Seller Name" />
+            </Form.Item>
+            <Form.Item name="sellerPhone" label="Seller Phone">
+              <Input placeholder="Seller Phone Number" />
+            </Form.Item>
+          </Flex>
+          <Flex align="center" justify="center" gap={15}>
+            <Form.Item name="minAmount" label="Minimum Net Amount">
+              <Input placeholder="Minimum Net Amount" type="number" />
+            </Form.Item>
+            <Form.Item name="maxAmount" label="Maximum Net Amount">
+              <Input placeholder="Maximum Net Amount" type="number" />
+            </Form.Item>
+            <Form.Item name="fromDate" label="Order Date">
+              <DatePicker placeholder="From Order Date" />
+            </Form.Item>
+            <Form.Item name="toDate" label="Order Date">
+              <DatePicker placeholder="To Order Date" />
+            </Form.Item>
+            <Form.Item>
+              <Button
+                className="btn-green"
+                htmlType="submit"
+                onClick={toggleSearch}
+              >
+                <SearchOutlined />
+              </Button>
+            </Form.Item>
+          </Flex>
+        </Form>
+        <Button
+          className={`btn-green ${showForm ? "hide" : "show"}`}
+          htmlType="submit"
+          onClick={toggleSearch}
+        >
+          <SearchOutlined />
+        </Button>
+      </div>
+
+      <Table
+        columns={columns}
+        dataSource={data?.data ? data?.data : []}
+        loading={loading}
+        pagination={false}
+        // scroll={{ y: 300 }}
+      />
+      <Pagination
+        className="pagination"
+        showSizeChanger
+        onShowSizeChange={onShowSizeChange}
+        defaultCurrent={data?.currentPage ? data?.currentPage + 1 : 1}
+        defaultPageSize={data?.pageSize}
+        total={data?.totalElements}
+        showTotal={(total, range) =>
+          `${range[0]}-${range[1]} of ${total} items`
+        }
+        responsive={true}
+        onChange={onChange}
+      />
+      <Modal
+        title="Order Detail"
+        open={visible}
+        onCancel={() => onCloseFunc()}
+        footer={null}
+      >
+        <h3>Order Items:</h3>
+        <div className="order-list">
+          <ol>
+            {order &&
+              order.map((itemData: OrderDetail, index: number) => (
+                <li key={index}>
+                  <div>
+                    <strong>{itemData?.item.display_name}</strong>
+                    <strong className="order-price">
+                      {itemData?.total_amount}MMK
+                    </strong>
+                  </div>
+                  <div>
+                    <strong>Quantity:</strong> {itemData.quantity}
+                  </div>
+                  <div>
+                    <strong>Price:</strong> {itemData.amount}MMK
+                  </div>
+                </li>
+              ))}
+          </ol>
+        </div>
+        <h3 className="total-amt">
+          Total Amount
+          <strong className="order-price">{totalAmt}MMK</strong>
+        </h3>
+
+        <div className="order-btn-container">
+          <Button onClick={onCloseFunc} className="btn-green order-btn">
+            OK
+          </Button>
+        </div>
+      </Modal>
+    </>
+  );
+}

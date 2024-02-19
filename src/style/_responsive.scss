@@ -1,0 +1,15 @@
+@import "./_variable.scss";
+
+// login form
+@media screen and (max-width: 1400px) {
+  .login-container {
+    width: 50vw;
+  }
+}
+
+@media screen and (max-width: 786px) {
+  .login-container {
+    width: 100vw;
+    margin-top: 0;
+  }
+}
