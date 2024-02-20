@@ -105,12 +105,13 @@ export default function App() {
             (index + 1),
         })
       );
-      setLoading(false);
       updatedData.orders.data = data;
       setData(updatedData.orders);
     } else {
+      console.log("dddd");
       setData({} as OrderResponse);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
