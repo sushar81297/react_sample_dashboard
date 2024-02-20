@@ -9,7 +9,7 @@ import {
   Space,
   Table,
 } from "antd";
-import { CloseOutlined, SearchOutlined } from "@ant-design/icons";
+import { CloseSquareOutlined, SearchOutlined } from "@ant-design/icons";
 import { getOrderById, getOrderData } from "@api/report";
 import { useEffect, useState } from "react";
 
@@ -17,6 +17,7 @@ import type { PaginationProps } from "antd";
 import type { TableProps } from "antd";
 import { dateFormat } from "@utils/constant.ts";
 import dayjs from "dayjs";
+import { useGetOrderData } from "@api/features/order";
 
 export default function App() {
   const [visible, setVisible] = useState(false);
@@ -26,6 +27,14 @@ export default function App() {
   const [totalAmt, setTotalAmt] = useState(0);
   const [filterReport, setFilterReport] = useState({} as FilterReportData);
   const [showForm, setShowForm] = useState(true);
+
+  const queryResponse = useGetOrderData(filterReport);
+
+  useEffect(() => {
+    if (queryResponse) {
+      setOrderDataFunc(queryResponse.data.data);
+    }
+  }, [queryResponse]);
 
   const columns: TableProps<OrderData>["columns"] = [
     {
@@ -91,7 +100,30 @@ export default function App() {
   };
 
   const fetchData = async (searchParam: FilterReportData) => {
-    const updatedData = await getOrderData(searchParam);
+    queryResponse.refetch();
+    // const updatedData = await getOrderData(searchParam);
+    // if (
+    //   updatedData &&
+    //   updatedData?.orders?.data &&
+    //   updatedData?.orders?.data.length > 0
+    // ) {
+    //   const data = updatedData.orders.data.map(
+    //     (item: OrderData, index: number) => ({
+    //       ...item,
+    //       key:
+    //         updatedData.orders.currentPage * updatedData.orders.pageSize +
+    //         (index + 1),
+    //     })
+    //   );
+    //   setLoading(false);
+    //   updatedData.orders.data = data;
+    //   setData(updatedData.orders);
+    // } else {
+    //   setData({} as OrderResponse);
+    // }
+  };
+
+  const setOrderDataFunc = (updatedData: any) => {
     if (
       updatedData &&
       updatedData?.orders?.data &&
@@ -227,7 +259,7 @@ export default function App() {
             </Form.Item>
             <Form.Item>
               <Button htmlType="submit" onClick={toggleSearch}>
-                <CloseOutlined />
+                <CloseSquareOutlined />
               </Button>
             </Form.Item>
           </Flex>

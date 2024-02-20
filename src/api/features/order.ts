@@ -4,10 +4,12 @@ import type { AxiosError } from "axios";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 
+const baseurl = import.meta.env.VITE_API_URL as string;
+
 const getOrderData = async (
   searchParam: FilterReportData
 ): Promise<OrderResponse> => {
-  const uri = `/order?filter=${getFilterQuery(searchParam)}&page=${
+  const uri = `${baseurl}/order?filter=${getFilterQuery(searchParam)}&page=${
     searchParam.pageNumber
   }&page_size=${searchParam.pageSize}`;
   const res = await axios.get(uri);
