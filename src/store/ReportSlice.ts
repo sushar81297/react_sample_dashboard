@@ -2,16 +2,16 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  detailId: {},
+  detailId: "" as string,
   orderData: {} as OrderResponse,
-  filterReport: {} as FilterReportData,
+  filterReport: { pageNumber: 0, pageSize: 10 } as FilterReportData,
 };
 
 const reportSlice = createSlice({
   name: "report",
   initialState,
   reducers: {
-    setDetailId: (state, action: PayloadAction<Login>) => {
+    setDetailId: (state, action: PayloadAction<string>) => {
       state.detailId = action.payload;
     },
     setOrderData: (state, action: PayloadAction<OrderResponse>) => {

@@ -11,14 +11,13 @@ export const queryClient = new QueryClient({
   },
   queryCache: new QueryCache({
     onError: (error) => {
-      console.log(error);
-      // store.dispatch(updateLoading(false));
+      console.log(error, "error");
       // store.dispatch(setIsErrorModal(true));
     },
   }),
   mutationCache: new MutationCache({
     onError: (error) => {
-      console.log(error);
+      console.log(error, "error");
     },
   }),
 });

@@ -5,50 +5,57 @@ import { PaginationProps } from "antd";
 import { RootState } from "@store";
 import { dateFormat } from "@utils/constant";
 import dayjs from "dayjs";
-import { getOrderData } from "@api/report";
 import { setLoading } from "@store/commonSlice";
+import { useGetOrderData } from "@api/features/order";
 
 const Report = () => {
   const dispatch = useDispatch();
   const { filterReport } = useSelector((state: RootState) => state.report);
-  const fetchData = async (searchParam: FilterReportData) => {
-    const updatedData = await getOrderData(searchParam);
-    if (
-      updatedData &&
-      updatedData?.orders?.data &&
-      updatedData?.orders?.data.length > 0
-    ) {
-      const data = updatedData.orders.data.map(
-        (item: OrderData, index: number) => ({
-          ...item,
-          key:
-            updatedData.orders.currentPage * updatedData.orders.pageSize +
-            (index + 1),
-        })
-      );
-      updatedData.orders.data = data;
-      dispatch(setOrderData(updatedData.orders));
-    } else {
-      dispatch(setOrderData({} as OrderResponse));
-    }
-    dispatch(setLoading(false));
-  };
+
+  const queryResponse = useGetOrderData(filterReport);
+
+  // const fetchData = async () => {
+  // const updatedData = await getOrderData(searchParam);
+  // if (
+  //   updatedData &&
+  //   updatedData?.orders?.data &&
+  //   updatedData?.orders?.data.length > 0
+  // ) {
+  //   const data = updatedData.orders.data.map(
+  //     (item: OrderData, index: number) => ({
+  //       ...item,
+  //       key:
+  //         updatedData.orders.currentPage * updatedData.orders.pageSize +
+  //         (index + 1),
+  //     })
+  //   );
+  //   updatedData.orders.data = data;
+  //   dispatch(setOrderData(updatedData.orders));
+  // } else {
+  //   dispatch(setOrderData({} as OrderResponse));
+  // }
+  // dispatch(setLoading(false));
+  // };
 
   const onChangePagination = async (pageNumber: number, pageSize: number) => {
-    const filter = filterReport;
-    filter.pageNumber = pageNumber - 1;
-    filter.pageSize = pageSize;
-    filterReportFunc(filter);
-  };
+    const updatedFilter = {
+      ...filterReport,
+      pageNumber: pageNumber - 1,
+      pageSize: pageSize,
+    };
 
-  const onShowSizeChange: PaginationProps["onShowSizeChange"] = (
+    await filterReportFunc(updatedFilter);
+  };
+  const onShowSizeChange: PaginationProps["onShowSizeChange"] = async (
     current,
     pageSize
   ) => {
-    const filter = filterReport;
-    filter.pageNumber = current;
-    filter.pageSize = pageSize;
-    filterReportFunc(filter);
+    const updatedFilter = {
+      ...filterReport,
+      pageNumber: current,
+      pageSize: pageSize,
+    };
+    await filterReportFunc(updatedFilter);
   };
 
   const onFinish = (value: ReportData) => {
@@ -82,11 +89,42 @@ const Report = () => {
   const filterReportFunc = (filter: FilterReportData) => {
     dispatch(setFilterReport(filter));
     dispatch(setLoading(true));
-    fetchData(filter);
+    queryResponse.refetch();
+  };
+
+  const handleResponse = (updatedData: any) => {
+    if (!updatedData || !updatedData.data) {
+      dispatch(setOrderData({} as OrderResponse));
+      dispatch(setLoading(false));
+      return;
+    }
+
+    const { data } = updatedData;
+    const { orders } = data;
+
+    if (!orders || !orders.data || orders.data.length === 0) {
+      dispatch(setOrderData({} as OrderResponse));
+      dispatch(setLoading(false));
+      return;
+    }
+
+    const { currentPage, pageSize } = orders;
+    const newData = {
+      ...data,
+      orders: {
+        ...orders,
+        data: orders.data.map((item: OrderData, index: number) => ({
+          ...item,
+          key: currentPage * pageSize + (index + 1),
+        })),
+      },
+    };
+    dispatch(setOrderData(newData.orders as OrderResponse));
+    dispatch(setLoading(false));
   };
 
   return {
-    fetchData,
+    handleResponse,
     onFinish,
     onShowSizeChange,
     onChangePagination,

@@ -12,26 +12,63 @@ import {
 import { CloseOutlined, SearchOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
+import { useGetOrderById, useGetOrderData } from "@api/features/order";
 
 import Report from "@composable/report";
 import { RootState } from "@store";
 import type { TableProps } from "antd";
 import { dateFormat } from "@utils/constant.ts";
 import dayjs from "dayjs";
-import { getOrderById } from "@api/report";
+import { setDetailId } from "@store/ReportSlice";
 import { setLoading } from "@store/commonSlice";
+
+// import { getOrderById } from "@api/report";
 
 export default function App() {
   const dispatch = useDispatch();
   const { orderData } = useSelector((state: RootState) => state.report);
   const { loading } = useSelector((state: RootState) => state.common);
-  const { fetchData, onFinish, onChangePagination, onShowSizeChange } =
+  const { filterReport, detailId } = useSelector(
+    (state: RootState) => state.report
+  );
+
+  const queryResponse = useGetOrderData(filterReport);
+  const orderDetailResponse = useGetOrderById(detailId);
+  const { onFinish, onChangePagination, onShowSizeChange, handleResponse } =
     Report();
 
   const [visible, setVisible] = useState(false);
   const [order, setOrder] = useState([] as OrderDetail[]);
   const [totalAmt, setTotalAmt] = useState(0);
   const [showForm, setShowForm] = useState(true);
+
+  useEffect(() => {
+    dispatch(setLoading(true));
+    queryResponse.refetch();
+  }, []);
+
+  useEffect(() => {
+    if (queryResponse.data) {
+      handleResponse(queryResponse.data);
+    }
+  }, [queryResponse.data]);
+
+  useEffect(() => {
+    if (!orderDetailResponse.data) return;
+
+    const detailData = orderDetailResponse.data.data;
+    if (!detailData || !detailData?.order_details) return;
+
+    let total = detailData?.order_details.reduce(
+      (acc, order) => acc + order.total_amount,
+      0
+    );
+
+    setOrder(detailData.order_details);
+    setTotalAmt(total);
+    dispatch(setLoading(false));
+    setVisible(true);
+  }, [dispatch, orderDetailResponse.data]);
 
   const columns: TableProps<OrderData>["columns"] = [
     {
@@ -84,22 +121,10 @@ export default function App() {
   ];
 
   const detailFunc = async (id: string) => {
+    await dispatch(setDetailId(id));
     dispatch(setLoading(true));
-    const detailData = await getOrderById(id);
-    let total = 0;
-    detailData?.order_details.map((order: OrderDetail) => {
-      total += order.total_amount;
-    });
-    setOrder(detailData.order_details);
-    setTotalAmt(total);
-    dispatch(setLoading(false));
-    setVisible(true);
+    orderDetailResponse.refetch();
   };
-
-  useEffect(() => {
-    dispatch(setLoading(true));
-    fetchData({ pageNumber: 0, pageSize: 10 });
-  }, []);
 
   const onCloseFunc = () => {
     setVisible(false);

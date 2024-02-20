@@ -30,12 +30,27 @@ const getFilterQuery = (searchParam: FilterReportData) => {
       else conditionArr.push(sfLike(f.key, f.value));
     });
   }
-  return sfAnd(conditionArr).toString();
+  if (conditionArr.length > 0) return sfAnd(conditionArr).toString();
+  return "";
 };
 
 export const useGetOrderData = (reqData: FilterReportData) => {
   return useQuery<OrderResponse, AxiosError>({
     queryKey: ["getOrderData", reqData],
     queryFn: () => getOrderData(reqData),
+  });
+};
+
+const getOrderById = async (orderId: string): Promise<OrderResponse> => {
+  const uri = `${baseurl}/order-detail/${orderId}`;
+  const res = await axios.get(uri);
+  return res.data;
+};
+
+export const useGetOrderById = (reqData: string) => {
+  return useQuery<OrderResponse, AxiosError>({
+    queryKey: ["getOrderById", reqData],
+    queryFn: () => getOrderById(reqData),
+    enabled: false,
   });
 };
