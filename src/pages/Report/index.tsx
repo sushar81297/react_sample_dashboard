@@ -10,21 +10,27 @@ import {
   Table,
 } from "antd";
 import { CloseOutlined, SearchOutlined } from "@ant-design/icons";
-import { getOrderById, getOrderData } from "@api/report";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 
-import type { PaginationProps } from "antd";
+import Report from "@composable/report";
+import { RootState } from "@store";
 import type { TableProps } from "antd";
 import { dateFormat } from "@utils/constant.ts";
 import dayjs from "dayjs";
+import { getOrderById } from "@api/report";
+import { setLoading } from "@store/commonSlice";
 
 export default function App() {
+  const dispatch = useDispatch();
+  const { orderData } = useSelector((state: RootState) => state.report);
+  const { loading } = useSelector((state: RootState) => state.common);
+  const { fetchData, onFinish, onChangePagination, onShowSizeChange } =
+    Report();
+
   const [visible, setVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [data, setData] = useState({} as OrderResponse);
   const [order, setOrder] = useState([] as OrderDetail[]);
   const [totalAmt, setTotalAmt] = useState(0);
-  const [filterReport, setFilterReport] = useState({} as FilterReportData);
   const [showForm, setShowForm] = useState(true);
 
   const columns: TableProps<OrderData>["columns"] = [
@@ -78,7 +84,7 @@ export default function App() {
   ];
 
   const detailFunc = async (id: string) => {
-    setLoading(true);
+    dispatch(setLoading(true));
     const detailData = await getOrderById(id);
     let total = 0;
     detailData?.order_details.map((order: OrderDetail) => {
@@ -86,92 +92,17 @@ export default function App() {
     });
     setOrder(detailData.order_details);
     setTotalAmt(total);
-    setLoading(false);
+    dispatch(setLoading(false));
     setVisible(true);
   };
 
-  const fetchData = async (searchParam: FilterReportData) => {
-    const updatedData = await getOrderData(searchParam);
-    if (
-      updatedData &&
-      updatedData?.orders?.data &&
-      updatedData?.orders?.data.length > 0
-    ) {
-      const data = updatedData.orders.data.map(
-        (item: OrderData, index: number) => ({
-          ...item,
-          key:
-            updatedData.orders.currentPage * updatedData.orders.pageSize +
-            (index + 1),
-        })
-      );
-      updatedData.orders.data = data;
-      setData(updatedData.orders);
-    } else {
-      console.log("dddd");
-      setData({} as OrderResponse);
-    }
-    setLoading(false);
-  };
-
   useEffect(() => {
-    setLoading(true);
+    dispatch(setLoading(true));
     fetchData({ pageNumber: 0, pageSize: 10 });
   }, []);
 
   const onCloseFunc = () => {
     setVisible(false);
-  };
-
-  const onChange = async (pageNumber: number, pageSize: number) => {
-    const filter = filterReport;
-    filter.pageNumber = pageNumber - 1;
-    filter.pageSize = pageSize;
-    filterReportFunc(filter);
-  };
-
-  const onShowSizeChange: PaginationProps["onShowSizeChange"] = (
-    current,
-    pageSize
-  ) => {
-    const filter = filterReport;
-    filter.pageNumber = current;
-    filter.pageSize = pageSize;
-    filterReportFunc(filter);
-  };
-
-  const onFinish = (value: ReportData) => {
-    const params = [
-      { key: "buyer.merchantCode", value: value.buyerCode },
-      { key: "buyer.name", value: value.buyerName },
-      { key: "buyer.phoneNumber", value: value.buyerPhone },
-      { key: "seller.merchantCode", value: value.sellerCode },
-      { key: "seller.name", value: value.sellerName },
-      { key: "seller.phoneNumber", value: value.sellerPhone },
-      { key: "minAmount", value: value.minAmount },
-      { key: "maxAmount", value: value.maxAmount },
-      {
-        key: "fromDate",
-        value: value.fromDate ? dayjs(value.fromDate).format(dateFormat) : "",
-      },
-      {
-        key: "toDate",
-        value: value.toDate
-          ? dayjs(value.toDate)
-              .hour(23)
-              .minute(59)
-              .second(59)
-              .format(dateFormat)
-          : "",
-      },
-    ].filter((param) => param.value !== "" && param.value !== undefined);
-    filterReportFunc({ filter: params, pageNumber: 0, pageSize: 10 });
-  };
-
-  const filterReportFunc = (filter: FilterReportData) => {
-    setFilterReport(filter);
-    setLoading(true);
-    fetchData(filter);
   };
 
   const toggleSearch = () => {
@@ -244,7 +175,7 @@ export default function App() {
 
       <Table
         columns={columns}
-        dataSource={data?.data ? data?.data : []}
+        dataSource={orderData?.data ? orderData?.data : []}
         loading={loading}
         pagination={false}
         scroll={{ y: 300 }}
@@ -253,14 +184,14 @@ export default function App() {
         className="pagination"
         showSizeChanger
         onShowSizeChange={onShowSizeChange}
-        defaultCurrent={data?.currentPage ? data?.currentPage + 1 : 1}
-        defaultPageSize={data?.pageSize}
-        total={data?.totalElements}
+        defaultCurrent={orderData?.currentPage ? orderData?.currentPage + 1 : 1}
+        defaultPageSize={orderData?.pageSize}
+        total={orderData?.totalElements}
         showTotal={(total, range) =>
           `${range[0]}-${range[1]} of ${total} items`
         }
         responsive={true}
-        onChange={onChange}
+        onChange={onChangePagination}
       />
       <Modal
         title="Order Detail"

@@ -52,12 +52,12 @@ export default function HeaderMenu({
         position: "fixed",
         top: 0,
         zIndex: 1,
-        width: "100%",
+        width: collapsed ? "100%" : "90%",
         color: themeColor.primaryColor,
         background: themeColor.whiteColor,
       }}
     >
-      <Row gutter={24}>
+      <Row>
         <Col span={10}>
           <Button
             type="text"
