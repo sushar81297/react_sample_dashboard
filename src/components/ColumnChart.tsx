@@ -2,63 +2,27 @@ import { Column } from "@ant-design/plots";
 
 export default function ColumnChart() {
   const data = [
-    {
-      type: "家具家电",
-      sales: 38,
-    },
-    {
-      type: "粮油副食",
-      sales: 52,
-    },
-    {
-      type: "生鲜水果",
-      sales: 61,
-    },
-    {
-      type: "美容洗护",
-      sales: 145,
-    },
-    {
-      type: "母婴用品",
-      sales: 48,
-    },
-    {
-      type: "进口食品",
-      sales: 38,
-    },
-    {
-      type: "食品饮料",
-      sales: 38,
-    },
-    {
-      type: "家庭清洁",
-      sales: 38,
-    },
+    { date: "2024/02/15", value: 100 },
+    { date: "2024/02/16", value: 220 },
+    { date: "2024/02/17", value: 150 },
+    { date: "2024/02/18", value: 180 },
+    { date: "2024/02/19", value: 200 },
+    { date: "2024/02/20", value: 130 },
+    { date: "2024/02/21", value: 120 },
   ];
+
   const config = {
-    data,
-    xField: "type",
-    yField: "sales",
+    data: data,
+    xField: "date",
+    yField: "value",
     label: {
+      position: "middle",
       style: {
         fill: "#FFFFFF",
         opacity: 0.6,
       },
     },
-    xAxis: {
-      label: {
-        autoHide: true,
-        autoRotate: false,
-      },
-    },
-    meta: {
-      type: {
-        alias: "类别",
-      },
-      sales: {
-        alias: "销售额",
-      },
-    },
   };
+
   return <Column {...config} />;
 }

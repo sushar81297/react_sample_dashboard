@@ -15,7 +15,7 @@ import User from "@pages/User/index";
 
 export default function RouterRoute() {
   const routes = [
-    { path: "home", name: "Home", element: Home },
+    { path: "demo", name: "Home", element: Home },
     { path: "about", name: "About", element: About },
     { path: "profile", name: "Profile", element: Profile },
     {

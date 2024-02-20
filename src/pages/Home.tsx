@@ -1,5 +1,3 @@
-// import { Area, Bar, Column, Pie } from "@ant-design/plots";
-
 import { ArrowDownOutlined, ArrowUpOutlined } from "@ant-design/icons";
 import { Card, Col, Row, Statistic } from "antd";
 
@@ -17,7 +15,7 @@ export default function Home() {
         <Col span={6}>
           <Card bordered={false}>
             <Statistic
-              title="Active"
+              title="Report"
               value={11.28}
               precision={2}
               valueStyle={{ color: "#3f8600" }}

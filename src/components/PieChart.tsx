@@ -2,42 +2,24 @@ import { Pie } from "@ant-design/plots";
 
 export default function PieChart() {
   const data = [
-    {
-      type: "分类一",
-      value: 27,
-    },
-    {
-      type: "分类二",
-      value: 25,
-    },
-    {
-      type: "分类三",
-      value: 18,
-    },
-    {
-      type: "分类四",
-      value: 15,
-    },
-    {
-      type: "分类五",
-      value: 10,
-    },
-    {
-      type: "其他",
-      value: 5,
-    },
+    { type: "red", value: 100 },
+    { type: "yellow", value: 220 },
+    { type: "green", value: 150 },
+    { type: "white", value: 180 },
+    { type: "blue", value: 200 },
+    { type: "pink", value: 130 },
+    { type: "gray", value: 120 },
   ];
   const config = {
-    appendPadding: 10,
-    data,
+    data: data,
     angleField: "value",
     colorField: "type",
     radius: 0.8,
-    interactions: [
-      {
-        type: "element-active",
-      },
-    ],
+    label: {
+      type: "spider",
+      content: "{name}\n{percentage}",
+    },
+    interactions: [{ type: "element-selected" }, { type: "element-active" }],
   };
   return <Pie {...config} />;
 }

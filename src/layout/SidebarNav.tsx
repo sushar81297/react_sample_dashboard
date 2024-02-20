@@ -30,9 +30,9 @@ export default function Sidebar({ collapsed, themeColor }: Props) {
 
   const menuItems = [
     {
-      key: "/home",
+      key: "/demo",
       icon: <HomeOutlined style={{ fontSize: "20px" }} type="setting" />,
-      label: <Link to="/home">Home</Link>,
+      label: <Link to="/demo">Demo Home</Link>,
     },
     {
       key: "/reporttag",
@@ -98,8 +98,8 @@ export default function Sidebar({ collapsed, themeColor }: Props) {
         background: themeColor.primaryColor,
       }}
     >
-      <div className="logo">
-        <img src={logoImg} width={collapsed ? "80px" : "120px"} />
+      <div className={`logo ${collapsed && "collapsed-logo"}`}>
+        <h1>GMS</h1>
       </div>
       <Menu
         theme="light"

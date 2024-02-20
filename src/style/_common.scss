@@ -7,12 +7,23 @@
 // logo css
 .logo {
   text-align: center;
+  h1 {
+    color: $white-color;
+    padding: 10px;
+    font-size: 3vw;
+  }
+}
+.collapsed-logo {
+  h1 {
+    font-size: 1vw;
+  }
 }
 .content-container {
   background: $white-color;
   color: $primary-color;
   padding: 24px;
   min-height: 360px;
+  margin-top: 10px;
   h2.title {
     margin-bottom: 2vw;
   }
@@ -177,6 +188,7 @@ h3.total-amt {
 
 // report
 .report-form {
+  float: right;
   padding: 20px;
   transition: all 0.3s ease;
 }
